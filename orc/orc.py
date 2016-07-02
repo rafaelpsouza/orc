@@ -9,10 +9,6 @@ import schedule
 import time
 import argparse
 
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-
-local_repository = '/home/rafael/sources/ops-remote-config/repos'
-
 def parseArguments():
 	parser = argparse.ArgumentParser()
 
@@ -58,6 +54,10 @@ def pull(local_repository):
 	remote = git.remote.Remote(git.Repo(local_repository), 'origin')
 	remote.pull()
 
+def create_orc_dir(orc_dir):
+	if not os.path.exists(orc_dir):
+		os.makedirs(orc_dir)
+
 def ops_remote_config(local_repository, remote_repository, 
 	config_dir, post_change_command):	
 	logging.debug('checking for remote changes')
@@ -76,12 +76,18 @@ def ops_remote_config(local_repository, remote_repository,
 			run_post_change(post_change_command)
 
 	except Exception, e:
-		logging.error('Fail to load new sensu server config')
+		logging.error('Fail to load remote config')
 		logging.exception(e)
 
-def main():	
+def main():
+	logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)	
+	orc_dir = os.path.expanduser("~") + '/.orc'
+	create_orc_dir(orc_dir)
+
 	repo_id = str(uuid.uuid4())
-	local_repository = local_repository + '/' + repo_id
+	local_repository = orc_dir + '/' + repo_id
+
+	args = parseArguments()
 
 	ops_remote_config(local_repository, args.remote_repository,
 		args.config_dir, args.post_change_command)
@@ -92,4 +98,4 @@ def main():
 
 	while True:
 		schedule.run_pending()
-		time.sleep(1)	
+		time.sleep(1)

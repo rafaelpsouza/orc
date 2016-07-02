@@ -79,7 +79,7 @@ def ops_remote_config(local_repository, remote_repository,
 		logging.error('Fail to load new sensu server config')
 		logging.exception(e)
 
-def main(args):	
+def main():	
 	repo_id = str(uuid.uuid4())
 	local_repository = local_repository + '/' + repo_id
 

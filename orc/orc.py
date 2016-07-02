@@ -7,10 +7,30 @@ import logging
 import uuid
 import schedule
 import time
+import argparse
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 local_repository = '/home/rafael/sources/ops-remote-config/repos'
+
+def parseArguments():
+	parser = argparse.ArgumentParser()
+
+	parser.add_argument('-r', '--remote-repository', 
+		help='Git remote repository url', required=True)
+
+	parser.add_argument('-c', '--config-dir', 
+		help='Local config dir path', required=True)
+
+	parser.add_argument('-p', '--post-change-command', 
+		help='Command to be executed after a remote repository change',
+		required=True)
+
+	parser.add_argument('-i', '--interval', 
+		help='Interval in secounds to verify for remote changes. Default 60',
+		default=60, type=int)
+
+	return parser.parse_args()
 
 def need_clone(local_repository):
 	return not os.path.exists(local_repository)

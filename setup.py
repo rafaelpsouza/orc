@@ -37,6 +37,6 @@ setup(
     install_requires=['schedule', 'gitpython'],
 
     entry_points = {
-        "console_scripts": ['orc = bootstrap.bootstrap:main']
+        "console_scripts": ['orc = orc.orc:main']
     },
 )

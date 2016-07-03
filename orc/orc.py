@@ -15,12 +15,14 @@ def parseArguments():
 	parser.add_argument('-r', '--remote-repository', 
 		help='Git remote repository url', required=True)
 
+	parser.add_argument('-e', '--remote-dir', 
+		help='Directory where configuration is stored in remote repository (use for dir per environment)', required=True)
+
 	parser.add_argument('-c', '--config-dir', 
-		help='Local config dir path', required=True)
+		help='Local config directory path', required=True)
 
 	parser.add_argument('-p', '--post-change-command', 
-		help='Command to be executed after a remote repository change',
-		required=True)
+		help='Command to be executed after a configuration change')
 
 	parser.add_argument('-i', '--interval', 
 		help='Interval in secounds to verify for remote changes. Default 60',
@@ -34,9 +36,12 @@ def need_clone(local_repository):
 def clone_repo(remote_url, local_repository):	
 	git.Repo.clone_from(remote_url, local_repository)
 
-def copy_config(local_repository, config_dir):
-	shutil.rmtree(config_dir)
-	shutil.copytree(local_repository, config_dir)
+def copy_config(local_repository, remote_dir, config_dir):
+	copy_repo_dir = local_repository + "/" +remote_dir
+	if os.path.exists(config_dir):
+		shutil.rmtree(config_dir)
+
+	shutil.copytree(copy_repo_dir, config_dir)
 
 def run_post_change(command):
 	call(command, shell=True)
@@ -54,25 +59,31 @@ def pull(local_repository):
 	remote = git.remote.Remote(git.Repo(local_repository), 'origin')
 	remote.pull()
 
-def create_orc_dir(orc_dir):
+def create_orc_dir():
+	orc_dir = os.path.expanduser("~") + '/.orc'
 	if not os.path.exists(orc_dir):
 		os.makedirs(orc_dir)
+	return orc_dir
+
+def create_local_repository():
+	repo_id = str(uuid.uuid4())
+	return create_orc_dir() + '/' + repo_id
 
 def ops_remote_config(local_repository, remote_repository, 
-	config_dir, post_change_command):	
-	logging.debug('checking for remote changes')
+	remote_dir, config_dir, post_change_command):	
 	
+	logging.debug('checking for remote changes')
 	try:
 		if(need_clone(local_repository)):
 			logging.info('cloning new config repo: '+remote_repository)
 			clone_repo(remote_repository, local_repository)
-			copy_config(local_repository, config_dir)
+			copy_config(local_repository, remote_dir, config_dir)
 			run_post_change(post_change_command)
 
 		elif(need_pull(local_repository)):
 			logging.info('remote changes found; fetching repository')
 			pull(local_repository)
-			copy_config(local_repository, config_dir)
+			copy_config(local_repository, remote_dir, config_dir)
 			run_post_change(post_change_command)
 
 	except Exception, e:
@@ -81,20 +92,16 @@ def ops_remote_config(local_repository, remote_repository,
 
 def main():
 	logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)	
-	orc_dir = os.path.expanduser("~") + '/.orc'
-	create_orc_dir(orc_dir)
-
-	repo_id = str(uuid.uuid4())
-	local_repository = orc_dir + '/' + repo_id
-
+	
+	local_repository = create_local_repository()
 	args = parseArguments()
 
 	ops_remote_config(local_repository, args.remote_repository,
-		args.config_dir, args.post_change_command)
+		args.remote_dir, args.config_dir, args.post_change_command)
 
 	schedule.every(args.interval).seconds.do(
-		ops_remote_config, local_repository, args.remote_repository,
-			args.config_dir, args.post_change_command)
+		ops_remote_config, local_repository, args.remote_repository, 
+		args.remote_dir, args.config_dir, args.post_change_command)
 
 	while True:
 		schedule.run_pending()

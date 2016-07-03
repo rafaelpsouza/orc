@@ -5,8 +5,9 @@ This script helps you to export your tools configuration (like: sensu, collectd,
 
 Installation
 ---------------------------
+.. code-block:: shell
 
-sudo pip install -e git+https://github.com/rafaelpsouza/orc.git#egg=orc
+	sudo pip install -e git+https://github.com/rafaelpsouza/orc.git#egg=orc
 
 Usage
 ---------------------------

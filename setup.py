@@ -12,7 +12,7 @@ setup(
     version='1.0.0',
     description='ORC: Ops Remote Config. Put your tools configuration files in a remote git repository',
     long_description=long_description,
-    url='https://github.com/pypa/sampleproject',
+    url='https://github.com/rafaelpsouza/orc',
     author='Rafael de Paula Souza   ',
     author_email='rafaelpsouza.eng@gmail.com',
     license='MIT',

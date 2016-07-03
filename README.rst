@@ -1,7 +1,7 @@
-ORC: Ops Remote Config
-========================
+ORC: Ops Remote Configuration
+====================================
 
-This script helps you to export your tools configuration (like: sensu, collectd, HAProxy ...) to a remote git repository.
+A python application/script to export your Ops tools configuration (like: sensu, collectd, HAProxy ...) to a remote git repository.
 
 Installation
 ---------------------------

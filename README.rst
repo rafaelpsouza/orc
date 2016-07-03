@@ -13,8 +13,11 @@ Usage
 
 Using orc command::
 *************************
+.. code-block:: shell
 
 	orc -r <REMOTE_REPOSITORY> -e <REMOTE_DIR> -c <CONFIG_DIR> -p <POST_CHANGE_COMMAND> -i <INTERVAL>
+
+.. code-block:: shell
 
 	orc --remote-repository <REMOTE_REPOSITORY> --remote-dir <REMOTE_DIR> --config-dir <CONFIG_DIR> --post-change-command <POST_CHANGE_COMMAND> --interval <INTERVAL>
 
@@ -38,10 +41,12 @@ Usages and Examples
 
 Sensu-server remote config
 **********************************
+.. code-block:: shell
 
 	sudo orc -r https://github.com/rafaelpsouza/remote-config.git -e dev -c /etc/sensu -i 30 -p 'sudo sensu-server restart'
 
 Collectd remote config
 *********************************
+.. code-block:: shell
 
 	sudo orc -r https://github.com/rafaelpsouza/remote-config.git -e prod -c /etc/collectd -i 30 -p 'sudo collectd restart'
